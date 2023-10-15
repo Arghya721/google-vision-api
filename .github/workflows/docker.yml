@@ -16,12 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Create credential file
+        run: |
+          echo ${{ secrets.GCP_SERVICE_ACCOUNT_KEY_JSON }} > ${{ secrets.GOOGLE_CREDENTIAL_FILE_NAME }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
       - name: Build the Docker image
         run: |
-          echo ${{ secrets.GCP_SERVICE_ACCOUNT_KEY_JSON }} > ${{ secrets.GOOGLE_CREDENTIAL_FILE_NAME }}
           docker build -t google-vision:latest .
 
       - name: Configure Docker credentials
