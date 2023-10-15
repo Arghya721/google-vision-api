@@ -10,8 +10,15 @@ import (
 
 func NewImageClient(ctx context.Context) (*vision.ImageAnnotatorClient, error) {
 	credentialFile := config.GoogleCredentialFileName
+	var client *vision.ImageAnnotatorClient
+	var err error
 
-	client, err := vision.NewImageAnnotatorClient(ctx, option.WithCredentialsFile(credentialFile))
+	if config.ApplicationEnv == config.ProductionEnv {
+		client, err = vision.NewImageAnnotatorClient(ctx)
+	} else {
+		client, err = vision.NewImageAnnotatorClient(ctx, option.WithCredentialsFile(credentialFile))
+	}
+
 	if err != nil {
 		return nil, err
 	}

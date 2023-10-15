@@ -6,6 +6,8 @@ import (
 
 var (
 	GoogleCredentialFileName string
+	ProductionEnv            string = "production"
+	ApplicationEnv           string
 )
 
 func InitializeConfig() {
@@ -21,5 +23,9 @@ func InitializeConfig() {
 
 	if viper.IsSet(`GOOGLE_CREDENTIAL_FILE_NAME`) {
 		GoogleCredentialFileName = viper.GetString(`GOOGLE_CREDENTIAL_FILE_NAME`)
+	}
+
+	if viper.IsSet(`APPLICATION_ENV`) {
+		ApplicationEnv = viper.GetString(`APPLICATION_ENV`)
 	}
 }
