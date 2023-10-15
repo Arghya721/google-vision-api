@@ -25,5 +25,3 @@ EXPOSE 1323
 
 # Command to run the executable
 CMD ["./google-vision"]
-
-
