@@ -40,7 +40,7 @@ jobs:
 
       - name: Push the Docker image
         env: 
-          ARTIFACT_REGISTRY_URL: ${{ secrets.GCP_ARTIFACT_REGISTRY_URL }}
+          ARTIFACT_REGISTRY_URL: ${{ secrets.GCP_ARTIFACT_REGISTORY_URL }}
         run: |
-          docker tag google-vision:latest asia-south1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/images/google-vision:latest
-          docker push asia-south1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/images/google-vision:latest
+          docker tag google-vision:latest $ARTIFACT_REGISTRY_URL/google-vision:latest
+          docker push $ARTIFACT_REGISTRY_URL/google-vision:latest
