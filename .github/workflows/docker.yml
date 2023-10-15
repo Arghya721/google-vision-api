@@ -16,9 +16,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Create credential file
+      - name: Create credential file and .env file
         run: |
           echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY_JSON }}" > ${{ secrets.GOOGLE_CREDENTIAL_FILE_NAME }}
+          echo "GOOGLE_CREDENTIAL_FILE_NAME=${{ secrets.GOOGLE_CREDENTIAL_FILE_NAME }}" > .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
