@@ -19,17 +19,11 @@ func RegisterGoogleVisionHandler(e *echo.Echo, googleVisionUsecase domain.Google
 	}
 
 	// Routes
-	e.GET("/", handler.HelloWorld)
 	e.POST("/extract-text", handler.ExtractText)
 	e.POST("/detect-labels", handler.DetectLabels)
 	e.POST("/detect-object", handler.DetectObject)
 	e.POST("/detect-landmark", handler.DetectLandmark)
 
-}
-
-// HelloWorld
-func (gv *GoogleVisionHandler) HelloWorld(c echo.Context) error {
-	return c.JSON(http.StatusOK, "Hello World!")
 }
 
 // ExtractText from image
