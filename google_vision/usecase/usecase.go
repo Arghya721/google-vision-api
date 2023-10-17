@@ -39,6 +39,38 @@ func (u *GoogleVisionUsecase) ExtractText(googleClient *vision.ImageAnnotatorCli
 	return
 }
 
+// ExtractTextWithBoundary from image
+func (u *GoogleVisionUsecase) ExtractTextWithBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.ExtractTextWithBoundaryResponse, err error) {
+
+	// Create a Vision image object from the base64-encoded image data
+	imageObj, err := vision.NewImageFromReader(imageBytes)
+	if err != nil {
+		return domain.ExtractTextWithBoundaryResponse{}, err
+	}
+
+	// Annotate the image
+	annotations, err := googleClient.DetectTexts(context.Background(), imageObj, nil, 10)
+	if err != nil {
+		return domain.ExtractTextWithBoundaryResponse{}, err
+	}
+
+	if len(annotations) == 0 {
+		return domain.ExtractTextWithBoundaryResponse{}, nil
+	}
+
+	response.Locale = annotations[0].Locale
+	response.Text = annotations[0].Description
+
+	for _, annotation := range annotations[0].BoundingPoly.Vertices {
+		response.Vertices = append(response.Vertices, domain.Vertices{
+			X: annotation.X,
+			Y: annotation.Y,
+		})
+	}
+
+	return
+}
+
 // DetectLabels from image
 func (u *GoogleVisionUsecase) DetectLabels(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.DetectLabelsResponse, err error) {
 
@@ -112,6 +144,37 @@ func (u *GoogleVisionUsecase) DetectLandmark(googleClient *vision.ImageAnnotator
 
 	for _, annotation := range annotations {
 		response.Landmarks = append(response.Landmarks, annotation.Description)
+	}
+
+	return
+}
+
+// DrawBoundary from image
+func (u *GoogleVisionUsecase) DrawBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.DrawBoundaryResponse, err error) {
+
+	// make a deep copy of imageBytes
+	imageBytesCopy := bytes.NewBuffer(imageBytes.Bytes())
+
+	// Create a Vision image object from the base64-encoded image data
+	imageObj, err := vision.NewImageFromReader(imageBytes)
+	if err != nil {
+		return domain.DrawBoundaryResponse{}, err
+	}
+
+	// Annotate the image
+	annotations, err := googleClient.DetectTexts(context.Background(), imageObj, nil, 10)
+	if err != nil {
+		return domain.DrawBoundaryResponse{}, err
+	}
+
+	if len(annotations) == 0 {
+		return domain.DrawBoundaryResponse{}, nil
+	}
+
+	// Draw boundary
+	response, err = DrawBoundary(imageBytesCopy, annotations)
+	if err != nil {
+		return domain.DrawBoundaryResponse{}, err
 	}
 
 	return

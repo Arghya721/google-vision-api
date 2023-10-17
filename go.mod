@@ -4,6 +4,8 @@ go 1.20
 
 require github.com/spf13/viper v1.17.0
 
+require golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
+
 require (
 	cloud.google.com/go v0.110.7 // indirect
 	cloud.google.com/go/compute v1.23.0 // indirect
@@ -11,6 +13,7 @@ require (
 	cloud.google.com/go/longrunning v0.5.1 // indirect
 	cloud.google.com/go/vision v1.2.0 // indirect
 	cloud.google.com/go/vision/v2 v2.7.2 // indirect
+	github.com/disintegration/imaging v1.6.2
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect

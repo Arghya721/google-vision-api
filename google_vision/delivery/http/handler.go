@@ -20,6 +20,8 @@ func RegisterGoogleVisionHandler(e *echo.Echo, googleVisionUsecase domain.Google
 
 	// Routes
 	e.POST("/extract-text", handler.ExtractText)
+	e.POST("/extract-text-with-boundary", handler.ExtractTextWithBoundary)
+	e.POST("/draw-boundary", handler.DrawBoundary)
 	e.POST("/detect-labels", handler.DetectLabels)
 	e.POST("/detect-object", handler.DetectObject)
 	e.POST("/detect-landmark", handler.DetectLandmark)
@@ -51,6 +53,45 @@ func (gv *GoogleVisionHandler) ExtractText(c echo.Context) error {
 
 	// Extract text from image
 	response, err := gv.GoogleVisionUsecase.ExtractText(client, imageBytes)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	if response.Text == "" {
+		return c.JSON(http.StatusBadRequest, domain.NoTextFoundError)
+	}
+
+	defer client.Close()
+
+	// Return JSON response
+	return c.JSON(http.StatusOK, response)
+}
+
+// ExtractTextWithBoundary from image
+func (gv *GoogleVisionHandler) ExtractTextWithBoundary(c echo.Context) error {
+	// Get image from request body form-data
+	image, err := ReadFormDataFile(c, "image")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
+	}
+
+	// Get image bytes
+	imageBytes, err := ImageProcessor(image)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
+	}
+
+	if imageBytes == nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotFoundError)
+	}
+
+	client, err := clients.NewImageClient(context.Background())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	// Extract text from image
+	response, err := gv.GoogleVisionUsecase.ExtractTextWithBoundary(client, imageBytes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -168,4 +209,40 @@ func (gv *GoogleVisionHandler) DetectLandmark(c echo.Context) error {
 
 	// Return JSON response
 	return c.JSON(http.StatusOK, response)
+}
+
+// DrawBoundary from image
+func (gv *GoogleVisionHandler) DrawBoundary(c echo.Context) error {
+
+	// Get image from request body form-data
+	image, err := ReadFormDataFile(c, "image")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
+	}
+
+	// Get image bytes
+	imageBytes, err := ImageProcessor(image)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
+	}
+
+	if imageBytes == nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotFoundError)
+	}
+
+	client, err := clients.NewImageClient(context.Background())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	// Extract text from image
+	response, err := gv.GoogleVisionUsecase.DrawBoundary(client, imageBytes)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	defer client.Close()
+
+	// Return a image response
+	return c.Stream(http.StatusOK, "image/png", response.Image)
 }
