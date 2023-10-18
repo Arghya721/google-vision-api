@@ -8,6 +8,8 @@ var (
 	GoogleCredentialFileName string
 	ProductionEnv            string = "production"
 	ApplicationEnv           string
+	DefaultColor             string = "#FF0000"
+	DefaultBorderSize        int    = 2
 )
 
 func InitializeConfig() {

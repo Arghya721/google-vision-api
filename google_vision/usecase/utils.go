@@ -61,8 +61,22 @@ func DecodeImage(imageBytes *bytes.Buffer) (img image.Image, err error) {
 	return
 }
 
+// HexToRGBA converts a hex string to a color.RGBA type.
+func HexToRGBA(hex string) (color.RGBA, error) {
+
+	// Convert the hex string to a color.RGBA type.
+	var clr color.RGBA
+	clr.A = 255 // alpha channel
+	_, err := fmt.Sscanf(hex, "#%02x%02x%02x", &clr.R, &clr.G, &clr.B)
+	if err != nil {
+		return color.RGBA{}, err
+	}
+
+	return clr, nil
+}
+
 // DrawBoundary from image
-func DrawBoundary(imageBytes *bytes.Buffer, annotations []*visionpb.EntityAnnotation) (response domain.DrawBoundaryResponse, err error) {
+func DrawBoundary(imageBytes *bytes.Buffer, annotations []*visionpb.EntityAnnotation, borderColor string, borderSize int) (response domain.DrawBoundaryResponse, err error) {
 
 	// take out the vertices
 	var vertices []domain.Vertices
@@ -83,8 +97,11 @@ func DrawBoundary(imageBytes *bytes.Buffer, annotations []*visionpb.EntityAnnota
 	rgba := image.NewRGBA(bounds)
 	draw.Draw(rgba, bounds, img, image.Point{0, 0}, draw.Src)
 
-	// Create a red color for drawing the boundary.
-	red := color.RGBA{255, 0, 0, 255}
+	// Convert the hex string to a color.RGBA type.
+	color, err := HexToRGBA(borderColor)
+	if err != nil {
+		return domain.DrawBoundaryResponse{}, err
+	}
 
 	var prevX *int32
 	var prevY *int32
@@ -103,14 +120,14 @@ func DrawBoundary(imageBytes *bytes.Buffer, annotations []*visionpb.EntityAnnota
 			continue
 		}
 
-		drawLine(rgba, *prevX, *prevY, currVertex.X, currVertex.Y, red)
+		drawLine(rgba, *prevX, *prevY, currVertex.X, currVertex.Y, color, borderSize)
 		prevX = &currVertex.X
 		prevY = &currVertex.Y
 
 	}
 
 	// connect the last vertex to the first vertex
-	drawLine(rgba, *prevX, *prevY, vertices[0].X, vertices[0].Y, red)
+	drawLine(rgba, *prevX, *prevY, vertices[0].X, vertices[0].Y, color, borderSize)
 
 	// Encode as PNG.
 	var buff bytes.Buffer
@@ -124,8 +141,7 @@ func DrawBoundary(imageBytes *bytes.Buffer, annotations []*visionpb.EntityAnnota
 	return
 }
 
-// drawLine draws a line on img from (x0, y0) to (x1, y1) using clr.
-func drawLine(img *image.RGBA, x0, y0, x1, y1 int32, clr color.RGBA) {
+func drawLine(img *image.RGBA, x0, y0, x1, y1 int32, clr color.RGBA, borderSize int) {
 	dx := abs(x1 - x0)
 	dy := abs(y1 - y0)
 	sx := -1
@@ -139,7 +155,10 @@ func drawLine(img *image.RGBA, x0, y0, x1, y1 int32, clr color.RGBA) {
 	err := dx - dy
 
 	for {
-		img.Set(int(x0), int(y0), clr)
+		for i := int32(0); i < int32(borderSize); i++ {
+			img.Set(int(x0+i), int(y0), clr)
+			img.Set(int(x0), int(y0+i), clr)
+		}
 		if x0 == x1 && y0 == y1 {
 			break
 		}

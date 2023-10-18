@@ -12,5 +12,5 @@ type GoogleVisionUsecase interface {
 	DetectLabels(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (DetectLabelsResponse, error)
 	DetectObject(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (DetectObjectResponse, error)
 	DetectLandmark(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (DetectLandmarkResponse, error)
-	DrawBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (DrawBoundaryResponse, error)
+	DrawBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer, color string, borderSize int) (DrawBoundaryResponse, error)
 }

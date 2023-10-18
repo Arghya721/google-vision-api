@@ -150,7 +150,7 @@ func (u *GoogleVisionUsecase) DetectLandmark(googleClient *vision.ImageAnnotator
 }
 
 // DrawBoundary from image
-func (u *GoogleVisionUsecase) DrawBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.DrawBoundaryResponse, err error) {
+func (u *GoogleVisionUsecase) DrawBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer, borderColor string, borderSize int) (response domain.DrawBoundaryResponse, err error) {
 
 	// make a deep copy of imageBytes
 	imageBytesCopy := bytes.NewBuffer(imageBytes.Bytes())
@@ -172,7 +172,7 @@ func (u *GoogleVisionUsecase) DrawBoundary(googleClient *vision.ImageAnnotatorCl
 	}
 
 	// Draw boundary
-	response, err = DrawBoundary(imageBytesCopy, annotations)
+	response, err = DrawBoundary(imageBytesCopy, annotations, borderColor, borderSize)
 	if err != nil {
 		return domain.DrawBoundaryResponse{}, err
 	}

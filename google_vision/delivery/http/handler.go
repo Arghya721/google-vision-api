@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"google-vision/config"
 	"google-vision/domain"
 	"google-vision/google_vision/delivery/clients"
 	"net/http"
@@ -220,6 +221,33 @@ func (gv *GoogleVisionHandler) DrawBoundary(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
 	}
 
+	// Get Color from request body form-data
+	borderColor, err := ReadFormDataString(c, "borderColor")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ColorNotValidError)
+	}
+
+	if borderColor == "" {
+		// add default red borderColor
+		borderColor = config.DefaultColor
+	}
+
+	// check if borderColor is a valid hex borderColor
+	if !IsHexColor(borderColor) {
+		return c.JSON(http.StatusBadRequest, domain.ColorNotValidError)
+	}
+
+	// Get borderSize from request body form-data
+	borderSize, err := ReadFormDataInt(c, "borderSize")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.BorderSizeNotValidError)
+	}
+
+	if borderSize == 0 {
+		// add default borderSize
+		borderSize = config.DefaultBorderSize
+	}
+
 	// Get image bytes
 	imageBytes, err := ImageProcessor(image)
 	if err != nil {
@@ -236,7 +264,7 @@ func (gv *GoogleVisionHandler) DrawBoundary(c echo.Context) error {
 	}
 
 	// Extract text from image
-	response, err := gv.GoogleVisionUsecase.DrawBoundary(client, imageBytes)
+	response, err := gv.GoogleVisionUsecase.DrawBoundary(client, imageBytes, borderColor, borderSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

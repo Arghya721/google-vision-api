@@ -23,3 +23,15 @@ var NoTextFoundError = ErrorDetails{
 	Code:        "noTextFound",
 	Description: "No text found",
 }
+
+// ColorNotValidError is a struct used for storing response of error details
+var ColorNotValidError = ErrorDetails{
+	Code:        "colorNotValid",
+	Description: "Color should be a valid hex color",
+}
+
+// BorderSizeNotValidError is a struct used for storing response of error details
+var BorderSizeNotValidError = ErrorDetails{
+	Code:        "borderSizeNotValid",
+	Description: "Border size should be a valid natural number",
+}
