@@ -269,6 +269,10 @@ func (gv *GoogleVisionHandler) DrawBoundary(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
+	if response.Image == nil {
+		return c.JSON(http.StatusBadRequest, domain.NoTextFoundError)
+	}
+
 	defer client.Close()
 
 	// Return a image response

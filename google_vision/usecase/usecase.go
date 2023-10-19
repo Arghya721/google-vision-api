@@ -17,14 +17,7 @@ func NewGoogleVisionUsecase() domain.GoogleVisionUsecase {
 // ExtractText from image
 func (u *GoogleVisionUsecase) ExtractText(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.ExtractTextResponse, err error) {
 
-	// Create a Vision image object from the base64-encoded image data
-	imageObj, err := vision.NewImageFromReader(imageBytes)
-	if err != nil {
-		return domain.ExtractTextResponse{}, err
-	}
-
-	// Annotate the image
-	annotations, err := googleClient.DetectTexts(context.Background(), imageObj, nil, 10)
+	annotations, err := ExtractTextFromImage(googleClient, imageBytes)
 	if err != nil {
 		return domain.ExtractTextResponse{}, err
 	}
@@ -33,6 +26,7 @@ func (u *GoogleVisionUsecase) ExtractText(googleClient *vision.ImageAnnotatorCli
 		return domain.ExtractTextResponse{}, nil
 	}
 
+	// get text and locale
 	response.Locale = annotations[0].Locale
 	response.Text = annotations[0].Description
 
@@ -43,13 +37,7 @@ func (u *GoogleVisionUsecase) ExtractText(googleClient *vision.ImageAnnotatorCli
 func (u *GoogleVisionUsecase) ExtractTextWithBoundary(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.ExtractTextWithBoundaryResponse, err error) {
 
 	// Create a Vision image object from the base64-encoded image data
-	imageObj, err := vision.NewImageFromReader(imageBytes)
-	if err != nil {
-		return domain.ExtractTextWithBoundaryResponse{}, err
-	}
-
-	// Annotate the image
-	annotations, err := googleClient.DetectTexts(context.Background(), imageObj, nil, 10)
+	annotations, err := ExtractTextFromImage(googleClient, imageBytes)
 	if err != nil {
 		return domain.ExtractTextWithBoundaryResponse{}, err
 	}
@@ -155,14 +143,7 @@ func (u *GoogleVisionUsecase) DrawBoundary(googleClient *vision.ImageAnnotatorCl
 	// make a deep copy of imageBytes
 	imageBytesCopy := bytes.NewBuffer(imageBytes.Bytes())
 
-	// Create a Vision image object from the base64-encoded image data
-	imageObj, err := vision.NewImageFromReader(imageBytes)
-	if err != nil {
-		return domain.DrawBoundaryResponse{}, err
-	}
-
-	// Annotate the image
-	annotations, err := googleClient.DetectTexts(context.Background(), imageObj, nil, 10)
+	annotations, err := ExtractTextFromImage(googleClient, imageBytes)
 	if err != nil {
 		return domain.DrawBoundaryResponse{}, err
 	}
