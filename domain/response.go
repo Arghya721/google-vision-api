@@ -17,6 +17,10 @@ type DetectLabelsResponse struct {
 	Labels []string `json:"labels"`
 }
 
+type DetectLabelsWithConfidenceResponse struct {
+	Labels []Label `json:"labels"`
+}
+
 type DetectObjectResponse struct {
 	Objects []string `json:"objects"`
 }

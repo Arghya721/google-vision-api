@@ -24,6 +24,7 @@ func RegisterGoogleVisionHandler(e *echo.Echo, googleVisionUsecase domain.Google
 	e.POST("/extract-text-with-boundary", handler.ExtractTextWithBoundary)
 	e.POST("/draw-boundary", handler.DrawBoundary)
 	e.POST("/detect-labels", handler.DetectLabels)
+	e.POST("/detect-labels-with-confidence", handler.DetectLabelsWithConfidence)
 	e.POST("/detect-object", handler.DetectObject)
 	e.POST("/detect-landmark", handler.DetectLandmark)
 
@@ -132,6 +133,41 @@ func (gv *GoogleVisionHandler) DetectLabels(c echo.Context) error {
 
 	// Extract text from image
 	response, err := gv.GoogleVisionUsecase.DetectLabels(client, imageBytes)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	defer client.Close()
+
+	// Return JSON response
+	return c.JSON(http.StatusOK, response)
+}
+
+// DetectLabelsWithConfidence from image
+func (gv *GoogleVisionHandler) DetectLabelsWithConfidence(c echo.Context) error {
+	// Get image from request body form-data
+	image, err := ReadFormDataFile(c, "image")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
+	}
+
+	// Get image bytes
+	imageBytes, err := ImageProcessor(image)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotValidError)
+	}
+
+	if imageBytes == nil {
+		return c.JSON(http.StatusBadRequest, domain.ImageNotFoundError)
+	}
+
+	client, err := clients.NewImageClient(context.Background())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	// Extract text from image
+	response, err := gv.GoogleVisionUsecase.DetectLabelsWithConfidence(client, imageBytes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

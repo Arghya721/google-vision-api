@@ -62,14 +62,7 @@ func (u *GoogleVisionUsecase) ExtractTextWithBoundary(googleClient *vision.Image
 // DetectLabels from image
 func (u *GoogleVisionUsecase) DetectLabels(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.DetectLabelsResponse, err error) {
 
-	// Create a Vision image object from the base64-encoded image data
-	imageObj, err := vision.NewImageFromReader(imageBytes)
-	if err != nil {
-		return domain.DetectLabelsResponse{}, err
-	}
-
-	// Annotate the image
-	annotations, err := googleClient.DetectLabels(context.Background(), imageObj, nil, 10)
+	annotations, err := DetectLabelsFromImage(googleClient, imageBytes)
 	if err != nil {
 		return domain.DetectLabelsResponse{}, err
 	}
@@ -85,20 +78,32 @@ func (u *GoogleVisionUsecase) DetectLabels(googleClient *vision.ImageAnnotatorCl
 	return
 }
 
+// DetectLabelsWithConfidence from image
+func (u *GoogleVisionUsecase) DetectLabelsWithConfidence(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.DetectLabelsWithConfidenceResponse, err error) {
+
+	annotations, err := DetectLabelsFromImage(googleClient, imageBytes)
+	if err != nil {
+		return domain.DetectLabelsWithConfidenceResponse{}, err
+	}
+
+	if len(annotations) == 0 {
+		return domain.DetectLabelsWithConfidenceResponse{}, nil
+	}
+
+	for _, annotation := range annotations {
+		response.Labels = append(response.Labels, domain.Label{
+			Name:       annotation.Description,
+			Confidence: annotation.Score * 100,
+		})
+	}
+
+	return
+}
+
 // DetectObject from image
 func (u *GoogleVisionUsecase) DetectObject(googleClient *vision.ImageAnnotatorClient, imageBytes *bytes.Buffer) (response domain.DetectObjectResponse, err error) {
 
-	// Create a Vision image object from the base64-encoded image data
-	imageObj, err := vision.NewImageFromReader(imageBytes)
-	if err != nil {
-		return domain.DetectObjectResponse{}, err
-	}
-
-	// Annotate the image
-	annotations, err := googleClient.LocalizeObjects(context.Background(), imageObj, nil)
-	if err != nil {
-		return domain.DetectObjectResponse{}, err
-	}
+	annotations, err := DetectObjectFromImage(googleClient, imageBytes)
 
 	if len(annotations) == 0 {
 		return domain.DetectObjectResponse{}, nil
