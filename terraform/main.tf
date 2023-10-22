@@ -12,8 +12,8 @@ provider "google" {
 data "google_project" "project" {}
 
 resource "google_cloud_run_service" "default" {
-    name = "google-vision" 
-    location = var.region 
+    name     = "google-vision"
+    location = var.region
 
     template {
         spec {
@@ -24,9 +24,10 @@ resource "google_cloud_run_service" "default" {
                 }
             }
         }
-        traffic {
-            percent         = 100
-            latest_revision = true
-        }
+    }
+
+    traffic {
+        percent         = 100
+        latest_revision = true
     }
 }
