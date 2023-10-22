@@ -1,21 +1,10 @@
-variable "service_account_key" {
-    default = jsondecode(${secrets.GCP_SERVICE_ACCOUNT_KEY_JSON})
-}
-
-variable "project_id" {
-    default = "${secrets.PROJECT_ID}"
-}
-
-variable "artifact_registry_url" {
-    default = "${secrets.GCP_ARTIFACT_REGISTORY_URL}"
-}
-
-variable "region" {
-    default = "${secrets.REGION}"
-}
+variable "service_account_key_json" {}
+variable "project_id" {}
+variable "artifact_registry_url" {}
+variable "region" {}
 
 provider "google" {
-    credentials = var.service_account_key
+    credentials = var.service_account_key_json
     project     = var.project_id
     region      = var.region
 }
