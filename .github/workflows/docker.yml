@@ -44,3 +44,16 @@ jobs:
         run: |
           docker tag google-vision:latest $ARTIFACT_REGISTRY_URL/google-vision:latest
           docker push $ARTIFACT_REGISTRY_URL/google-vision:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: terraform init
+        
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
