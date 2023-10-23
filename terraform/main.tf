@@ -11,7 +11,7 @@ provider "google" {
 
 data "google_project" "project" {}
 
-resource "google_cloud_run_service" "google-vision" {
+resource "google_cloud_run_v2_service" "google-vision" {
     name     = "vision"
     location = var.region
 
@@ -27,9 +27,9 @@ resource "google_cloud_run_service" "google-vision" {
     }
 
     traffic {
-        percent         = 100
-        latest_revision = true
-    }
+        type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+        percent = 100
+  }
 }
 
 data "google_iam_policy" "noauth" {
@@ -42,9 +42,9 @@ data "google_iam_policy" "noauth" {
 }
 
 resource "google_cloud_run_service_iam_policy" "noauth" {
-    location = google_cloud_run_service.google-vision.location
-    project  = google_cloud_run_service.google-vision.project
-    service  = google_cloud_run_service.google-vision.name
+    location = google_cloud_run_v2_service.google-vision.location
+    project  = google_cloud_run_v2_service.google-vision.project
+    service  = google_cloud_run_v2_service.google-vision.name
 
     policy_data = data.google_iam_policy.noauth.policy_data
 }
