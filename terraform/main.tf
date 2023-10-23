@@ -11,8 +11,8 @@ provider "google" {
 
 data "google_project" "project" {}
 
-resource "google_cloud_run_service" "default" {
-    name     = "google-vision"
+resource "google_cloud_run_service" "google-vision" {
+    name     = "vision"
     location = var.region
 
     template {
