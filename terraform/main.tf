@@ -16,12 +16,10 @@ resource "google_cloud_run_v2_service" "google-vision" {
     location = var.region
 
     template {
-        spec {
-            containers {
-                image = "${var.artifact_registry_url}/google-vision:latest"
-                ports {
-                    container_port = 1323
-                }
+        containers {
+            image = "${var.artifact_registry_url}/google-vision:latest"
+            ports {
+                container_port = 1323
             }
         }
     }
