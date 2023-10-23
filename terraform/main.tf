@@ -46,5 +46,5 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
     project  = google_cloud_run_service.google-vision.project
     service  = google_cloud_run_service.google-vision.name
 
-    policy = data.google_iam_policy.noauth.binding
+    policy_data = data.google_iam_policy.noauth.policy_data
 }
