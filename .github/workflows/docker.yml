@@ -65,4 +65,5 @@ jobs:
           image: ${{ secrets.GCP_ARTIFACT_REGISTORY_URL }}/google-vision:latest
           platform: "managed"
           region: ${{ secrets.REGION }}
+          service: google-vision  # Add the service argument to specify the Cloud Run service name
         
