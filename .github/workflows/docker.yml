@@ -50,6 +50,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Configure GCP Credentials
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY_JSON }}
+          project_id: ${{ secrets.PROJECT_ID }}
+          export_default_credentials: true
+          
       # deploy to cloud run 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@main
