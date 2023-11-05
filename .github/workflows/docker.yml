@@ -46,7 +46,7 @@ jobs:
           docker push $ARTIFACT_REGISTRY_URL/google-vision:latest
 
   deploy:
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
